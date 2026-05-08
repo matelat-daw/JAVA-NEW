@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Communique - Comunicación en Tiempo Real</title>
+    <link rel="stylesheet" href="styles.css?v=1.2">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <div class="app-container">
+        <!-- Panel de Registro -->
+        <div id="registerPanel" class="panel active">
+            <div class="register-card">
+                <div class="logo">
+                    <i class="fas fa-satellite-dish"></i>
+                    <h1>Communique</h1>
+                    <p>Conecta con tu red local de forma segura</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="username">Nombre de Usuario</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="username" placeholder="Ej: Juan Pérez" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="serverUrl">Servidor</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-server"></i>
+                        <input type="text" id="serverUrl" placeholder="http://192.168.1.33:8080" value="http://192.168.1.33:8080" required>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="app.register()">
+                    <i class="fas fa-plug"></i> Conectar
+                </button>
+                
+                <div id="registerError" class="error-message" style="display: none;"></div>
+                <div id="registerSuccess" class="success-message" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Panel Principal -->
+        <div id="mainPanel" class="panel">
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <div class="app-logo">
+                        <i class="fas fa-satellite-dish"></i>
+                        <span>Communique</span>
+                    </div>
+                </div>
+
+                <div class="current-user-card">
+                    <div class="user-avatar">
+                        <i class="fas fa-circle-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <h4 id="currentUser">Usuario</h4>
+                        <span id="connectionStatus" class="status-badge offline">Desconectado</span>
+                    </div>
+                    <button class="btn-icon" onclick="app.disconnect()" title="Desconectar">
+                        <i class="fas fa-power-off"></i>
+                    </button>
+                </div>
+
+                <div class="sidebar-content">
+                    <div class="section-title">
+                        <span>USUARIOS EN LÍNEA</span>
+                        <span id="onlineCount" class="count-badge">0</span>
+                    </div>
+                    <div id="usersList" class="users-list">
+                        <!-- Usuarios se cargan aquí -->
+                    </div>
+                </div>
+
+                <div class="sidebar-footer">
+                    <div class="network-info">
+                        <p><i class="fas fa-network-wired"></i> <span id="userIp">0.0.0.0</span></p>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="chat-area">
+                <div id="noChatSelected" class="empty-state">
+                    <i class="far fa-comments"></i>
+                    <h2>Tu mensajería local</h2>
+                    <p>Selecciona un usuario de la lista para comenzar a chatear.</p>
+                </div>
+
+                <div id="chatContainer" class="chat-container" style="display: none;">
+                    <header class="chat-header">
+                        <div class="target-user-info">
+                            <div class="user-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <h3 id="targetUserName">Usuario Destino</h3>
+                                <span class="status-text">En línea</span>
+                            </div>
+                        </div>
+                        <div class="chat-actions">
+                            <button id="callBtn" class="btn-call" title="Iniciar Llamada" onclick="app.startCall()">
+                                <i class="fas fa-phone"></i> Llamar
+                            </button>
+                            <button id="hangupBtn" class="btn-hangup" title="Colgar" onclick="app.endCall()" style="display: none;">
+                                <i class="fas fa-phone-slash"></i> Colgar
+                            </button>
+                        </div>
+                    </header>
+
+                    <div id="callStatus" class="call-status-bar" style="display: none;">
+                        <i class="fas fa-microphone"></i>
+                        <span id="callStatusText">Llamada en curso...</span>
+                    </div>
+
+                    <div id="chatMessages" class="chat-messages">
+                        <!-- Mensajes se cargan aquí -->
+                    </div>
+
+                    <footer class="chat-input-container">
+                        <div class="input-wrapper">
+                            <button class="btn-icon">
+                                <i class="far fa-face-smile"></i>
+                            </button>
+                            <input type="text" id="chatInput" placeholder="Escribe un mensaje aquí..." disabled>
+                            <button id="sendBtn" class="btn-send" onclick="app.sendMessage()" disabled>
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </footer>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Elemento de Audio para Llamadas -->
+    <audio id="remoteAudio" autoplay></audio>
+
+    <!-- Modal de Llamada Entrante -->
+    <div id="incomingCallModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="call-animation">
+                <i class="fas fa-phone-volume"></i>
+            </div>
+            <h3>Llamada Entrante</h3>
+            <p id="callerName">Usuario</p>
+            <div class="modal-actions">
+                <button class="btn btn-success" onclick="app.acceptCall()">
+                    <i class="fas fa-phone"></i> Aceptar
+                </button>
+                <button class="btn btn-danger" onclick="app.rejectCall()">
+                    <i class="fas fa-times"></i> Rechazar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js?v=1.1"></script>
+</body>
+</html>

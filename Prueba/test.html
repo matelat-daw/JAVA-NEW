@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba App - Test Endpoints</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .endpoint-test {
+            margin-bottom: 20px;
+        }
+        .response {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            padding: 15px;
+            margin-top: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Prueba App - Test Endpoints</h1>
+        
+        <!-- Token Input -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Authentication Token</h5>
+            </div>
+            <div class="card-body">
+                <div class="input-group">
+                    <span class="input-group-text">Bearer Token</span>
+                    <input type="text" class="form-control" id="token-input" placeholder="Enter your JWT token here">
+                    <button class="btn btn-primary" type="button" onclick="saveToken()">Save</button>
+                </div>
+                <div class="mt-3">
+                    <button class="btn btn-secondary" onclick="loadToken()">Load Token from localStorage</button>
+                    <button class="btn btn-danger" onclick="clearToken()">Clear Token</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Endpoints -->
+        <div class="endpoint-test">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Public Endpoint</h5>
+                </div>
+                <div class="card-body">
+                    <p><code>GET /api/test/all</code></p>
+                    <button class="btn btn-success" onclick="testPublicEndpoint()">Test</button>
+                    <div id="response-public" class="response mt-3">
+                        <pre>Response will appear here...</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint-test">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Protected Endpoint (User)</h5>
+                </div>
+                <div class="card-body">
+                    <p><code>GET /api/test/user</code></p>
+                    <button class="btn btn-info" onclick="testUserEndpoint()">Test</button>
+                    <div id="response-user" class="response mt-3">
+                        <pre>Response will appear here...</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint-test">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Admin Endpoint</h5>
+                </div>
+                <div class="card-body">
+                    <p><code>GET /api/test/admin</code></p>
+                    <button class="btn btn-warning" onclick="testAdminEndpoint()">Test</button>
+                    <div id="response-admin" class="response mt-3">
+                        <pre>Response will appear here...</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Form -->
+        <div class="endpoint-test">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Login Form</h5>
+                </div>
+                <div class="card-body">
+                    <form onsubmit="event.preventDefault(); login();">
+                        <div class="mb-3">
+                            <label for="login-username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="login-username" value="admin">
+                        </div>
+                        <div class="mb-3">
+                            <label for="login-password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="login-password" value="admin">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </form>
+                    <div id="response-login" class="response mt-3">
+                        <pre>Login response will appear here...</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Register Form -->
+        <div class="endpoint-test">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Register Form</h5>
+                </div>
+                <div class="card-body">
+                    <form onsubmit="event.preventDefault(); register();">
+                        <div class="mb-3">
+                            <label for="register-username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="register-username">
+                        </div>
+                        <div class="mb-3">
+                            <label for="register-email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="register-email">
+                        </div>
+                        <div class="mb-3">
+                            <label for="register-password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="register-password">
+                        </div>
+                        <button type="submit" class="btn btn-secondary">Register</button>
+                    </form>
+                    <div id="response-register" class="response mt-3">
+                        <pre>Register response will appear here...</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8088/api';
+
+        // Guardar token
+        function saveToken() {
+            const token = document.getElementById('token-input').value;
+            if (token) {
+                localStorage.setItem('authToken', token);
+                alert('Token saved!');
+            }
+        }
+
+        // Cargar token desde localStorage
+        function loadToken() {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                document.getElementById('token-input').value = token;
+                alert('Token loaded!');
+            } else {
+                alert('No token found in localStorage');
+            }
+        }
+
+        // Limpiar token
+        function clearToken() {
+            localStorage.removeItem('authToken');
+            document.getElementById('token-input').value = '';
+            alert('Token cleared!');
+        }
+
+        // Realizar petición HTTP
+        async function apiRequest(endpoint, options = {}) {
+            const url = `${API_BASE_URL}${endpoint}`;
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
+            const token = document.getElementById('token-input').value || localStorage.getItem('authToken');
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers
+                });
+
+                const data = await response.json().catch(() => ({}));
+
+                return {
+                    status: response.status,
+                    ok: response.ok,
+                    data: data
+                };
+            } catch (error) {
+                return {
+                    status: 0,
+                    ok: false,
+                    data: { message: error.message }
+                };
+            }
+        }
+
+        // Test public endpoint
+        async function testPublicEndpoint() {
+            const responseDiv = document.getElementById('response-public');
+            responseDiv.innerHTML = '<pre>Testing...</pre>';
+
+            const result = await apiRequest('/test/all');
+            responseDiv.innerHTML = `<pre>Status: ${result.status}\nOK: ${result.ok}\n\nResponse:\n${JSON.stringify(result.data, null, 2)}</pre>`;
+        }
+
+        // Test user endpoint
+        async function testUserEndpoint() {
+            const responseDiv = document.getElementById('response-user');
+            responseDiv.innerHTML = '<pre>Testing...</pre>';
+
+            const result = await apiRequest('/test/user');
+            responseDiv.innerHTML = `<pre>Status: ${result.status}\nOK: ${result.ok}\n\nResponse:\n${JSON.stringify(result.data, null, 2)}</pre>`;
+        }
+
+        // Test admin endpoint
+        async function testAdminEndpoint() {
+            const responseDiv = document.getElementById('response-admin');
+            responseDiv.innerHTML = '<pre>Testing...</pre>';
+
+            const result = await apiRequest('/test/admin');
+            responseDiv.innerHTML = `<pre>Status: ${result.status}\nOK: ${result.ok}\n\nResponse:\n${JSON.stringify(result.data, null, 2)}</pre>`;
+        }
+
+        // Login
+        async function login() {
+            const responseDiv = document.getElementById('response-login');
+            responseDiv.innerHTML = '<pre>Logging in...</pre>';
+
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+
+            const result = await apiRequest('/auth/signin', {
+                method: 'POST',
+                body: JSON.stringify({ username, password })
+            });
+
+            if (result.ok && result.data.jwt) {
+                localStorage.setItem('authToken', result.data.jwt);
+                responseDiv.innerHTML = `<pre>Status: ${result.status}\nOK: ${result.ok}\n\nResponse:\n${JSON.stringify(result.data, null, 2)}</pre>`;
+                alert('Login successful! Token saved to localStorage.');
+            } else {
+                responseDiv.innerHTML = `<pre>Status: ${result.status}\nOK: ${result.ok}\n\nError:\n${JSON.stringify(result.data, null, 2)}</pre>`;
+            }
+        }
+
+        // Register
+        async function register() {
+            const responseDiv = document.getElementById('response-register');
+            responseDiv.innerHTML = '<pre>Registering...</pre>';
+
+            const username = document.getElementById('register-username').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+
+            const result = await apiRequest('/auth/signup', {
+                method: 'POST',
+                body: JSON.stringify({ username, email, password })
+            });
+
+            responseDiv.innerHTML = `<pre>Status: ${result.status}\nOK: ${result.ok}\n\nResponse:\n${JSON.stringify(result.data, null, 2)}</pre>`;
+        }
+    </script>
+</body>
+</html>

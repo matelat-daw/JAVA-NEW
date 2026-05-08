@@ -1,0 +1,13 @@
+### En Google Chrome / Microsoft Edge (PC y Android)
+Este es el método más fiable:
+
+1. Copia y pega esto en tu barra de direcciones: chrome://flags/#unsafely-treat-insecure-origin-as-secure (si usas Edge, es edge://flags/... ).
+2. Busca la opción "Insecure origins treated as secure" .
+3. Cámbiala a Enabled .
+4. En el cuadro de texto que aparece debajo, escribe la dirección exacta de tu servidor (IP y puerto): http://192.168.1.33:8080
+5. Pulsa el botón Relaunch (Reiniciar) que aparecerá abajo a la derecha.
+### 2. En Firefox (PC)
+1. Escribe about:config en la barra de direcciones y acepta el aviso de riesgo.
+2. Busca estas dos preferencias y cámbialas a true haciendo doble clic:
+   - media.devices.enumerate.allow_insecure
+   - media.getusermedia.insecure.allowed
