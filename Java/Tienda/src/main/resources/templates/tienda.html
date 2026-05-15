@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda Tech</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <h1 class="mb-4 text-center text-primary" th:text="${nombreTienda}"></h1>
+                <p class="text-center lead mb-5" th:text="${mensaje}"></p>
+                <p class="text-center text-muted mb-4">Convertida a Spring Boot con Thymeleaf</p>
+                <p class="text-center text-muted mb-5">Arquitectura moderna con Spring MVC, JPA y base de datos MariaDB</p>
+
+                <div class="d-grid gap-3">
+                    <a class="btn btn-primary btn-lg" th:href="@{/tienda/catalogo}">📦 Ver Catálogo</a>
+                    <a class="btn btn-success btn-lg" th:href="@{/tienda/resumen}">📊 Ver Resumen</a>
+                    <a class="btn btn-danger btn-lg" th:href="@{/tienda/contacto}">📧 Contacto</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
