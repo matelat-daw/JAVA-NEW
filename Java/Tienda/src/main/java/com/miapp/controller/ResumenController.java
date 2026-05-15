@@ -19,15 +19,15 @@ public class ResumenController {
         var productos = productoService.obtenerCatalogo();
         var totalProductos = productos.size();
         var precioPromedio = productos.stream()
-                .mapToDouble(p -> p.getPrecio())
+                .mapToDouble(p -> p.getPrecio().doubleValue())
                 .average()
                 .orElse(0.0);
         var precioMayor = productos.stream()
-                .mapToDouble(p -> p.getPrecio())
+                .mapToDouble(p -> p.getPrecio().doubleValue())
                 .max()
                 .orElse(0.0);
         var precioMenor = productos.stream()
-                .mapToDouble(p -> p.getPrecio())
+                .mapToDouble(p -> p.getPrecio().doubleValue())
                 .min()
                 .orElse(0.0);
         

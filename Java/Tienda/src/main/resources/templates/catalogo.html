@@ -1,15 +1,24 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo - Tienda Tech</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-</head>
+<head th:replace="~{fragments/head :: head('Catálogo - Tienda Tech')}"></head>
 <body>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+    
     <div class="container py-5">
         <h1 class="mb-2 text-primary">📦 Catálogo de Productos</h1>
+        
+        <!-- Mensaje de éxito si se acaba de crear o eliminar un producto -->
+        <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+            <strong>✅ ¡Éxito!</strong> <span th:text="${mensajeExito}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+        
+        <!-- Mensaje de error -->
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+            <strong>❌ Error:</strong> <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+        
         <p class="text-muted mb-4">Total disponible: <span class="badge bg-info" th:text="${productos.size()}"></span> productos</p>
 
         <div class="mb-4">
@@ -55,6 +64,7 @@
             <a th:href="@{/}" class="btn btn-outline-primary">← Volver al inicio</a>
         </nav>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <div th:replace="~{fragments/footer :: footer}"></div>
 </body>
 </html>

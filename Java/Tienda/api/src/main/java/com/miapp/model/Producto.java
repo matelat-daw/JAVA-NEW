@@ -6,29 +6,28 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
+@Entity
+@Table(name = "producto")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "producto")
 public class Producto {
-    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    
+
     @Column(nullable = false)
     private String nombre;
-    
+
     @Column(nullable = false, columnDefinition = "DECIMAL(10,2)")
     private BigDecimal precio;
-    
+
     @Column(nullable = false)
     private String categoria;
-    
+
     @Column(columnDefinition = "TEXT")
     private String descripcion;
-    
+
     @Column(nullable = true)
     private String imagen;
 }

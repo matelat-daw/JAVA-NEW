@@ -29,11 +29,11 @@ public class Contacto {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String mensaje;
     
-    @Column(nullable = false)
-    private LocalDateTime fechaCreacion;
+    @Column(name = "fecha_envio", nullable = false)
+    private LocalDateTime fechaEnvio;
     
     @PrePersist
     protected void onCreate() {
-        this.fechaCreacion = LocalDateTime.now();
+        this.fechaEnvio = LocalDateTime.now();
     }
 }

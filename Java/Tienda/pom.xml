@@ -48,7 +48,7 @@
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
-            <version>3.4.1</version>
+            <version>3.5.8</version>
         </dependency>
 
         <!-- Lombok -->
@@ -94,6 +94,12 @@
                 <configuration>
                     <source>25</source>
                     <target>25</target>
+                    <fork>true</fork>
+                    <compilerArgs>
+                        <arg>-Xlint:-removal</arg>
+                        <arg>--add-opens</arg>
+                        <arg>java.base/java.lang=ALL-UNNAMED</arg>
+                    </compilerArgs>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
