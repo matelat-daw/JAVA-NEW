@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
 
 /**
  * Clase utilitaria para construir URLs de imágenes de productos y manejar carga de archivos
@@ -14,10 +13,10 @@ import java.util.UUID;
 public class ImagesUtil {
 
     // Ruta base de las imágenes en el servidor web
-    private static final String IMAGES_PATH = "/recursos/imgs/";
+    private static final String IMAGES_PATH = "/imgs/";
     
     // Ruta física donde se guardan las imágenes
-    private static final String UPLOAD_DIR = "src/main/resources/static/recursos/imgs/";
+    private static final String UPLOAD_DIR = "src/main/resources/static/imgs/";
     
     // Extensiones permitidas
     private static final String[] ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "gif", "webp"};
@@ -49,7 +48,7 @@ public class ImagesUtil {
         if (nombreImagen == null || nombreImagen.isEmpty()) {
             nombreImagen = "placeholder.webp";
         }
-        return contextPath + "/recursos/imgs/" + nombreImagen;
+        return contextPath + "/imgs/" + nombreImagen;
     }
 
     /**

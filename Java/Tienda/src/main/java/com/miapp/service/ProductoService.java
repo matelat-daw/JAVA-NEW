@@ -1,21 +1,25 @@
 package com.miapp.service;
 
 import com.miapp.model.Producto;
+import com.miapp.model.Categoria;
 import com.miapp.repository.ProductoRepository;
+import com.miapp.repository.CategoriaRepository;
 import com.miapp.util.ImagesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductoService {
     
     @Autowired
     private ProductoRepository productoRepository;
+
+    @Autowired
+    private CategoriaRepository categoriaRepository;
     
     public List<Producto> obtenerCatalogo() {
         return productoRepository.findAll();
@@ -49,7 +53,9 @@ public class ProductoService {
     }
     
     public List<String> obtenerCategorias() {
-        return productoRepository.findAllCategorias();
+        return categoriaRepository.findAll().stream()
+                .map(Categoria::getNombre)
+                .collect(Collectors.toList());
     }
     
     /**

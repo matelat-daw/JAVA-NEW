@@ -71,10 +71,10 @@ public class ProductApiController {
         }
     }
 
-    @GetMapping("/recursos/imgs/{filename:.+}")
+    @GetMapping("/imgs/{filename:.+}")
     public ResponseEntity<byte[]> getImage(@PathVariable String filename) {
         try {
-            Path path = Paths.get("src/main/resources/static/recursos/imgs/" + filename);
+            Path path = Paths.get("src/main/resources/static/imgs/" + filename);
             if (!Files.exists(path)) return ResponseEntity.notFound().build();
             String contentType = Files.probeContentType(path);
             byte[] bytes = Files.readAllBytes(path);

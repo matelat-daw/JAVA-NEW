@@ -8,7 +8,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import java.math.BigDecimal;
 import java.util.Optional;
 
@@ -82,11 +81,12 @@ public class CatalogoController {
             // Guardar con imagen
             Producto productoGuardado = productoService.guardarProductoConImagen(producto, imagen);
             
-            // Usar flash attributes para pasar el mensaje de éxito
-            redirectAttributes.addFlashAttribute("mensajeExito", "¡Producto creado exitosamente!");
-            redirectAttributes.addFlashAttribute("nuevoProductoId", productoGuardado.getId());
+            // Usar flash attributes para pasar el mensaje de éxito y datos del producto para el modal
+            redirectAttributes.addFlashAttribute("tipo", "exito");
+            redirectAttributes.addFlashAttribute("mensaje", "¡Producto creado exitosamente!");
+            redirectAttributes.addFlashAttribute("nombreProducto", productoGuardado.getNombre());
+            redirectAttributes.addFlashAttribute("precioProducto", productoGuardado.getPrecio());
             
-            // Redirigir al catálogo sin parámetros en la URL
             return "redirect:/tienda/catalogo";
         } catch (IllegalArgumentException e) {
             // Error de validación (extensión, tamaño, etc)
@@ -140,6 +140,7 @@ public class CatalogoController {
             
             // Guardar con imagen (imagen puede ser null/vacío)
             productoService.guardarProductoConImagen(producto, imagen);
+            
             return "redirect:/tienda/detalle/" + id;
         } catch (IllegalArgumentException e) {
             // Error de validación (extensión, tamaño, etc)
@@ -166,7 +167,12 @@ public class CatalogoController {
             if (producto.isPresent()) {
                 String nombreProducto = producto.get().getNombre();
                 productoService.eliminarProducto(id);
-                redirectAttributes.addFlashAttribute("mensajeExito", "¡Producto '" + nombreProducto + "' eliminado correctamente!");
+                
+                // Usar sistema de modales para la eliminación
+                redirectAttributes.addFlashAttribute("tipo", "eliminado");
+                redirectAttributes.addFlashAttribute("mensaje", "El producto ha sido eliminado permanentemente.");
+                redirectAttributes.addFlashAttribute("nombreProducto", nombreProducto);
+                
                 return "redirect:/tienda/catalogo";
             } else {
                 redirectAttributes.addFlashAttribute("error", "Producto no encontrado");
