@@ -1,4 +1,4 @@
-package com.miapp.api.controller;
+package com.miapp.controller;
 
 import com.miapp.model.Producto;
 import com.miapp.service.ProductoService;
@@ -10,7 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;

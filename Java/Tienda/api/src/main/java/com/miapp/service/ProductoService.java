@@ -6,7 +6,6 @@ import com.miapp.util.ImagesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +20,7 @@ public class ProductoService {
         return productoRepository.findAll();
     }
 
-    public Optional<Producto> obtenerProductoPorId(int id) {
+    public Optional<Producto> obtenerProductoPorId(Integer id) {
         return productoRepository.findById(id);
     }
 
@@ -29,7 +28,7 @@ public class ProductoService {
         return productoRepository.save(producto);
     }
 
-    public void eliminarProducto(int id) {
+    public void eliminarProducto(Integer id) {
         Optional<Producto> producto = productoRepository.findById(id);
         if (producto.isPresent() && producto.get().getImagen() != null) {
             ImagesUtil.eliminarImagen(producto.get().getImagen());
@@ -49,9 +48,11 @@ public class ProductoService {
         return productoRepository.findAllCategorias();
     }
 
-    public Producto guardarProductoConImagen(Producto producto, MultipartFile imagenFile) throws Exception {
+        public Producto guardarProductoConImagen(Producto producto, MultipartFile imagenFile) throws Exception {
         String imagenAnterior = null;
-        if (producto.getId() > 0) {
+        
+        // CORRECCIÓN: Validar que el objeto ID exista y sea mayor que cero
+        if (producto.getId() != null && producto.getId() > 0) {
             Optional<Producto> productoExistente = productoRepository.findById(producto.getId());
             if (productoExistente.isPresent()) {
                 imagenAnterior = productoExistente.get().getImagen();
@@ -64,7 +65,7 @@ public class ProductoService {
             }
             String nombreImagen = ImagesUtil.guardarImagen(imagenFile);
             producto.setImagen(nombreImagen);
-        } else if (producto.getId() > 0 && imagenAnterior != null) {
+        } else if (producto.getId() != null && producto.getId() > 0 && imagenAnterior != null) {
             producto.setImagen(imagenAnterior);
         }
 

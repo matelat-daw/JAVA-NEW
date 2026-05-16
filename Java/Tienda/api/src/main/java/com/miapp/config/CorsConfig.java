@@ -1,4 +1,4 @@
-package com.miapp.api.config;
+package com.miapp.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
