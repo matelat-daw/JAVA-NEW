@@ -59,8 +59,7 @@ public class ImagesUtil {
         if (!esImagenValida(originalFilename)) throw new IllegalArgumentException("Extensión de archivo no permitida.");
 
         Path uploadDirPath = getUploadDirPath();
-        File uploadDir = uploadDirPath.toFile();
-        if (!uploadDir.exists()) uploadDir.mkdirs();
+        Files.createDirectories(uploadDirPath);
 
         String nombreSanitizado = originalFilename.replaceAll("[^a-zA-Z0-9._-]", "_");
         if (nombreSanitizado.contains(".")) {
