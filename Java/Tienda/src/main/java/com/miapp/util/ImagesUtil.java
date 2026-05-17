@@ -6,23 +6,34 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
-/**
- * Clase utilitaria para construir URLs de imágenes de productos y manejar carga de archivos
- */
 public class ImagesUtil {
 
     // Ruta base de las imágenes en el servidor web
     private static final String IMAGES_PATH = "/imgs/";
-    
-    // Ruta física donde se guardan las imágenes
-    private static final String UPLOAD_DIR = "src/main/resources/static/imgs/";
     
     // Extensiones permitidas
     private static final String[] ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "gif", "webp"};
     
     // Tamaño máximo de archivo en bytes (5MB)
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024;
+
+    public static Path getUploadDirPath() {
+        String configured = Optional.ofNullable(System.getProperty("tienda.images.dir"))
+                .filter(s -> !s.isBlank())
+                .orElseGet(() -> Optional.ofNullable(System.getenv("TIENDA_IMAGES_DIR"))
+                        .filter(s -> !s.isBlank())
+                        .orElseGet(() -> {
+                            String catalinaBase = System.getProperty("catalina.base");
+                            if (catalinaBase != null && !catalinaBase.isBlank()) {
+                                return Paths.get(catalinaBase, "tienda-api", "imgs").toString();
+                            }
+                            return Paths.get(System.getProperty("user.home"), "tienda-api", "imgs").toString();
+                        }));
+
+        return Paths.get(configured);
+    }
 
     /**
      * Obtiene la URL completa de una imagen a partir de su nombre
@@ -102,8 +113,8 @@ public class ImagesUtil {
             throw new IllegalArgumentException("Extensión de archivo no permitida. Extensiones válidas: jpg, jpeg, png, gif, webp");
         }
         
-        // Crear directorio si no existe
-        File uploadDir = new File(UPLOAD_DIR);
+        Path uploadDirPath = getUploadDirPath();
+        File uploadDir = uploadDirPath.toFile();
         if (!uploadDir.exists()) {
             uploadDir.mkdirs();
         }
@@ -117,13 +128,13 @@ public class ImagesUtil {
         
         // Usar el nombre original sanitizado con la extensión
         String nombreArchivo = nombreSanitizado + "." + extension;
-        Path filepath = Paths.get(UPLOAD_DIR + nombreArchivo);
+        Path filepath = uploadDirPath.resolve(nombreArchivo);
         
         // Si el archivo ya existe, agregar un contador
         int contador = 1;
         while (Files.exists(filepath)) {
             nombreArchivo = nombreSanitizado + "_" + contador + "." + extension;
-            filepath = Paths.get(UPLOAD_DIR + nombreArchivo);
+            filepath = uploadDirPath.resolve(nombreArchivo);
             contador++;
         }
         
@@ -158,7 +169,7 @@ public class ImagesUtil {
             return false;
         }
         try {
-            Path filepath = Paths.get(UPLOAD_DIR + nombreImagen);
+            Path filepath = getUploadDirPath().resolve(nombreImagen);
             Files.deleteIfExists(filepath);
             return true;
         } catch (IOException e) {

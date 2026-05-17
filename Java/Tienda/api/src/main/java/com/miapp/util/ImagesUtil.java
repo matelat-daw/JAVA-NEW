@@ -6,12 +6,28 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 public class ImagesUtil {
-    private static final String IMAGES_PATH = "/recursos/imgs/";
-    private static final String UPLOAD_DIR = "src/main/resources/static/recursos/imgs/";
+    private static final String IMAGES_PATH = "/imgs/";
     private static final String[] ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "gif", "webp"};
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024;
+
+    public static Path getUploadDirPath() {
+        String configured = Optional.ofNullable(System.getProperty("tienda.images.dir"))
+                .filter(s -> !s.isBlank())
+                .orElseGet(() -> Optional.ofNullable(System.getenv("TIENDA_IMAGES_DIR"))
+                        .filter(s -> !s.isBlank())
+                        .orElseGet(() -> {
+                            String catalinaBase = System.getProperty("catalina.base");
+                            if (catalinaBase != null && !catalinaBase.isBlank()) {
+                                return Paths.get(catalinaBase, "tienda-api", "imgs").toString();
+                            }
+                            return Paths.get(System.getProperty("user.home"), "tienda-api", "imgs").toString();
+                        }));
+
+        return Paths.get(configured);
+    }
 
     public static String getImagenURL(String nombreImagen) {
         if (nombreImagen == null || nombreImagen.isEmpty()) {
@@ -42,7 +58,8 @@ public class ImagesUtil {
         String extension = getExtension(originalFilename).toLowerCase();
         if (!esImagenValida(originalFilename)) throw new IllegalArgumentException("Extensión de archivo no permitida.");
 
-        File uploadDir = new File(UPLOAD_DIR);
+        Path uploadDirPath = getUploadDirPath();
+        File uploadDir = uploadDirPath.toFile();
         if (!uploadDir.exists()) uploadDir.mkdirs();
 
         String nombreSanitizado = originalFilename.replaceAll("[^a-zA-Z0-9._-]", "_");
@@ -51,11 +68,11 @@ public class ImagesUtil {
         }
 
         String nombreArchivo = nombreSanitizado + "." + extension;
-        Path filepath = Paths.get(UPLOAD_DIR + nombreArchivo);
+        Path filepath = uploadDirPath.resolve(nombreArchivo);
         int contador = 1;
         while (Files.exists(filepath)) {
             nombreArchivo = nombreSanitizado + "_" + contador + "." + extension;
-            filepath = Paths.get(UPLOAD_DIR + nombreArchivo);
+            filepath = uploadDirPath.resolve(nombreArchivo);
             contador++;
         }
 
@@ -72,7 +89,7 @@ public class ImagesUtil {
     public static boolean eliminarImagen(String nombreImagen) {
         if (nombreImagen == null || nombreImagen.isEmpty() || nombreImagen.equals("placeholder.webp")) return false;
         try {
-            Path filepath = Paths.get(UPLOAD_DIR + nombreImagen);
+            Path filepath = getUploadDirPath().resolve(nombreImagen);
             Files.deleteIfExists(filepath);
             return true;
         } catch (IOException e) {

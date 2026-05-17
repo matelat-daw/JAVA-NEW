@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -73,7 +72,7 @@ public class ProductApiController {
     @GetMapping("/imgs/{filename:.+}")
     public ResponseEntity<byte[]> getImage(@PathVariable String filename) {
         try {
-            Path path = Paths.get("src/main/resources/static/imgs/" + filename);
+            Path path = ImagesUtil.getUploadDirPath().resolve(filename);
             if (!Files.exists(path)) return ResponseEntity.notFound().build();
             String contentType = Files.probeContentType(path);
             byte[] bytes = Files.readAllBytes(path);

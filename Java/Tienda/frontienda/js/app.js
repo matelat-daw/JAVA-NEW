@@ -1,13 +1,58 @@
-const API_BASE_URL = 'http://localhost:8088/api';
-const IMG_BASE_URL = 'http://localhost:8088/api/imgs';
+const API_BASE_URL = 'http://localhost:8080/api';
+const IMG_BASE_URL = 'http://localhost:8080/api/imgs';
 
-// App state
 const app = document.getElementById('app');
 const modalContainer = document.getElementById('modal-container');
 
-// Router
+const BASE_PATH = (document.querySelector('base')?.getAttribute('href') || '/').replace(/\/$/, '');
+
+function pathFor(route, params = {}) {
+    switch (route) {
+        case 'home':
+            return `${BASE_PATH}/`;
+        case 'catalogo':
+            return `${BASE_PATH}/catalogo`;
+        case 'nuevo':
+            return `${BASE_PATH}/nuevo`;
+        case 'resumen':
+            return `${BASE_PATH}/resumen`;
+        case 'contacto':
+            return `${BASE_PATH}/contacto`;
+        case 'detalle':
+            return `${BASE_PATH}/detalle/${params.id}`;
+        case 'editar':
+            return `${BASE_PATH}/editar/${params.id}`;
+        default:
+            return `${BASE_PATH}/`;
+    }
+}
+
+function routeFromLocation() {
+    const pathname = window.location.pathname;
+    const withoutBase = (BASE_PATH && pathname.startsWith(BASE_PATH))
+        ? pathname.slice(BASE_PATH.length)
+        : pathname;
+    const clean = withoutBase.replace(/^\/+/, '').replace(/\/+$/, '');
+
+    if (!clean) return { route: 'home', params: {} };
+
+    const parts = clean.split('/');
+    const route = parts[0];
+    const id = parts[1];
+
+    if (route === 'detalle' && id) return { route: 'detalle', params: { id } };
+    if (route === 'editar' && id) return { route: 'editar', params: { id } };
+    if (route === 'catalogo') return { route: 'catalogo', params: {} };
+    if (route === 'nuevo') return { route: 'nuevo', params: {} };
+    if (route === 'resumen') return { route: 'resumen', params: {} };
+    if (route === 'contacto') return { route: 'contacto', params: {} };
+
+    return { route: 'home', params: {} };
+}
+
 function navigate(route, params = {}) {
-    window.location.hash = route + (params.id ? `/${params.id}` : '');
+    const path = pathFor(route, params);
+    window.history.pushState({ route, params }, '', path);
     render(route, params);
 }
 
@@ -435,16 +480,12 @@ function showSuccessModal(accion, nombre) {
     modal.show();
 }
 
-// Initial render and history handling
-window.addEventListener('hashchange', () => {
-    const hash = window.location.hash.substring(1);
-    const [route, id] = hash.split('/');
-    render(route || 'home', { id });
+window.addEventListener('popstate', () => {
+    const { route, params } = routeFromLocation();
+    render(route, params);
 });
 
 window.addEventListener('load', () => {
-    const hash = window.location.hash.substring(1);
-    const [route, id] = hash.split('/');
-    render(route || 'home', { id });
+    const { route, params } = routeFromLocation();
+    render(route, params);
 });
-
