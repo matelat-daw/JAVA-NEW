@@ -10,7 +10,7 @@
                     <span class="badge bg-info">{{categoria}}</span>
                     <strong class="text-success ms-2">$ {{precio}}</strong>
                 </p>
-                <div class="d-flex gap-1">
+                <div class="d-flex gap-2">
                     <button class="btn btn-sm btn-primary py-1" onclick="navigate('detalle', {id: '{{id}}'})">👁️</button>
                     <button class="btn btn-sm btn-warning py-1" onclick="navigate('editar', {id: '{{id}}'})">✏️</button>
                     <button class="btn btn-sm btn-danger py-1" onclick="confirmarEliminacion('{{id}}', '{{nombreJs}}')">🗑️</button>
@@ -19,4 +19,3 @@
         </div>
     </div>
 </div>
-

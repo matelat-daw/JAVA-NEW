@@ -52,7 +52,8 @@ footer {
         display: none;
     }
     .desktop-table {
-        display: table;
+        display: block;
+        width: 100%;
     }
 }
 

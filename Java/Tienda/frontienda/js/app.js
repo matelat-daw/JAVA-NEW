@@ -32,6 +32,9 @@ function pathFor(route, params = {}) {
         case 'home':
             return `${BASE_PATH}/`;
         case 'catalogo':
+            if (params.page && Number(params.page) > 1) {
+                return `${BASE_PATH}/catalogo?page=${encodeURIComponent(String(params.page))}`;
+            }
             return `${BASE_PATH}/catalogo`;
         case 'nuevo':
             return `${BASE_PATH}/nuevo`;
@@ -63,7 +66,10 @@ function routeFromLocation() {
 
     if (route === 'detalle' && id) return { route: 'detalle', params: { id } };
     if (route === 'editar' && id) return { route: 'editar', params: { id } };
-    if (route === 'catalogo') return { route: 'catalogo', params: {} };
+    if (route === 'catalogo') {
+        const page = Number(new URLSearchParams(window.location.search).get('page')) || 1;
+        return { route: 'catalogo', params: { page } };
+    }
     if (route === 'nuevo') return { route: 'nuevo', params: {} };
     if (route === 'resumen') return { route: 'resumen', params: {} };
     if (route === 'contacto') return { route: 'contacto', params: {} };
@@ -86,7 +92,7 @@ async function render(route, params = {}) {
             await renderHome();
             break;
         case 'catalogo':
-            await renderCatalogo();
+            await renderCatalogo(params.page);
             break;
         case 'detalle':
             await renderDetalle(params.id);
@@ -113,11 +119,11 @@ async function renderHome() {
     app.innerHTML = await homeHtml();
 }
 
-async function renderCatalogo() {
+async function renderCatalogo(page = 1) {
     try {
         const response = await fetch(`${API_BASE_URL}/products`);
         const products = await response.json();
-        app.innerHTML = await catalogoHtml({ products, imgBaseUrl: IMG_BASE_URL });
+        app.innerHTML = await catalogoHtml({ products, imgBaseUrl: IMG_BASE_URL, page, pageSize: 8 });
     } catch (error) {
         app.innerHTML = '<div class="alert alert-danger">Error al cargar el catálogo</div>';
     }
@@ -265,7 +271,8 @@ async function deleteProduct(id) {
     try {
         await fetch(`${API_BASE_URL}/products/${id}`, { method: 'DELETE' });
         bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
-        await renderCatalogo();
+        const { params } = routeFromLocation();
+        await renderCatalogo(params.page);
     } catch (error) {
         alert('Error al eliminar');
     }

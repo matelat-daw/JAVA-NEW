@@ -5,11 +5,10 @@
     <td><span class="badge bg-info">{{categoria}}</span></td>
     <td><strong class="text-success">$ {{precio}}</strong></td>
     <td>
-        <div class="btn-group btn-group-sm">
-            <button class="btn btn-primary" onclick="navigate('detalle', {id: '{{id}}'})">👁️ Ver</button>
-            <button class="btn btn-warning" onclick="navigate('editar', {id: '{{id}}'})">✏️ Editar</button>
-            <button class="btn btn-danger" onclick="confirmarEliminacion('{{id}}', '{{nombreJs}}')">🗑️ Eliminar</button>
+        <div class="d-flex gap-2 flex-wrap">
+            <button class="btn btn-sm btn-primary" onclick="navigate('detalle', {id: '{{id}}'})">👁️ Ver</button>
+            <button class="btn btn-sm btn-warning" onclick="navigate('editar', {id: '{{id}}'})">✏️ Editar</button>
+            <button class="btn btn-sm btn-danger" onclick="confirmarEliminacion('{{id}}', '{{nombreJs}}')">🗑️ Eliminar</button>
         </div>
     </td>
 </tr>
-
