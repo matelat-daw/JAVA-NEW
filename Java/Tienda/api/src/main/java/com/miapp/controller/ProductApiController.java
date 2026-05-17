@@ -27,6 +27,11 @@ public class ProductApiController {
         return productoService.obtenerCatalogo();
     }
 
+    @GetMapping("/categorias")
+    public List<String> categorias() {
+        return productoService.obtenerCategorias();
+    }
+
     @GetMapping("/products/{id}")
     public ResponseEntity<Producto> get(@PathVariable int id) {
         Optional<Producto> p = productoService.obtenerProductoPorId(id);

@@ -4,6 +4,26 @@ const IMG_BASE_URL = 'http://localhost:8080/api/imgs';
 const app = document.getElementById('app');
 const modalContainer = document.getElementById('modal-container');
 
+let categoriasCache = null;
+
+function escapeHtml(value) {
+    return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+}
+
+async function fetchCategorias() {
+    if (Array.isArray(categoriasCache)) return categoriasCache;
+    const res = await fetch(`${API_BASE_URL}/categorias`);
+    if (!res.ok) throw new Error(`Error al cargar categorías (${res.status})`);
+    const data = await res.json();
+    categoriasCache = Array.isArray(data) ? data : [];
+    return categoriasCache;
+}
+
 const BASE_PATH = (document.querySelector('base')?.getAttribute('href') || '/').replace(/\/$/, '');
 
 function pathFor(route, params = {}) {
@@ -264,6 +284,21 @@ async function renderFormulario(id = null) {
         }
     }
 
+    let categorias = [];
+    try {
+        categorias = await fetchCategorias();
+    } catch (e) {
+        categorias = [];
+    }
+
+    const opcionesCategorias = [
+        `<option value="" disabled ${!p.categoria ? 'selected' : ''}>Selecciona una categoría</option>`,
+        ...categorias.map((c) => {
+            const selected = p.categoria === c ? 'selected' : '';
+            return `<option value="${escapeHtml(c)}" ${selected}>${escapeHtml(c)}</option>`;
+        })
+    ].join('');
+
     app.innerHTML = `
         <div class="container py-3 py-md-5">
             <div class="row justify-content-center">
@@ -293,11 +328,7 @@ async function renderFormulario(id = null) {
                                 <div class="mb-3">
                                     <label class="form-label">Categoría:</label>
                                     <select class="form-select" name="categoria" required>
-                                        <option value="" disabled ${!p.categoria ? 'selected' : ''}>Selecciona una categoría</option>
-                                        <option value="Periféricos" ${p.categoria === 'Periféricos' ? 'selected' : ''}>Periféricos</option>
-                                        <option value="Pantallas" ${p.categoria === 'Pantallas' ? 'selected' : ''}>Pantallas</option>
-                                        <option value="Audio" ${p.categoria === 'Audio' ? 'selected' : ''}>Audio</option>
-                                        <option value="Componentes" ${p.categoria === 'Componentes' ? 'selected' : ''}>Componentes</option>
+                                        ${opcionesCategorias}
                                     </select>
                                 </div>
                                 <div class="mb-3">

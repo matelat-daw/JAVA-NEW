@@ -14,4 +14,7 @@ public interface ProductoRepository extends JpaRepository<Producto, Integer> {
 
     @Query("SELECT DISTINCT p.categoria FROM Producto p")
     List<String> findAllCategorias();
+
+    @Query(value = "SELECT nombre FROM categoria ORDER BY nombre", nativeQuery = true)
+    List<String> findAllCategoriaNombres();
 }

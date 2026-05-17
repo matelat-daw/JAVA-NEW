@@ -45,7 +45,7 @@ public class ProductoService {
     }
 
     public List<String> obtenerCategorias() {
-        return productoRepository.findAllCategorias();
+        return productoRepository.findAllCategoriaNombres();
     }
 
         public Producto guardarProductoConImagen(Producto producto, MultipartFile imagenFile) throws Exception {
