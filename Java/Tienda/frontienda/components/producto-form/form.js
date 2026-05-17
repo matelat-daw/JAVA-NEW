@@ -10,6 +10,7 @@ export async function productoFormHtml({ producto, isEdit, id, opcionesCategoria
     return renderTemplate(tpl, {
         titulo: isEdit ? '✏️ Editar Producto' : '➕ Nuevo Producto',
         id: escapeHtml(id || ''),
+        imagenActual: escapeHtml(p.imagen || ''),
         nombre: escapeHtml(p.nombre),
         precio: escapeHtml(p.precio),
         opcionesCategorias: opcionesCategoriasHtml,

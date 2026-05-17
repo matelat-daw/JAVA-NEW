@@ -48,8 +48,15 @@ public class ProductApiController {
     public ResponseEntity<Producto> update(@PathVariable int id, @RequestBody Producto producto) {
         Optional<Producto> existing = productoService.obtenerProductoPorId(id);
         if (!existing.isPresent()) return ResponseEntity.notFound().build();
-        producto.setId(id);
-        Producto saved = productoService.guardarProducto(producto);
+        Producto target = existing.get();
+        target.setNombre(producto.getNombre());
+        target.setPrecio(producto.getPrecio());
+        target.setCategoria(producto.getCategoria());
+        target.setDescripcion(producto.getDescripcion());
+        if (producto.getImagen() != null && !producto.getImagen().isBlank()) {
+            target.setImagen(producto.getImagen());
+        }
+        Producto saved = productoService.guardarProducto(target);
         return ResponseEntity.ok(saved);
     }
 

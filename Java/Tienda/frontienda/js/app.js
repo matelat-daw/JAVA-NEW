@@ -173,12 +173,17 @@ async function renderFormulario(id = null) {
     document.getElementById('productForm').onsubmit = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
+        const imagenActual = (formData.get('imagenActual') || '').toString();
         const productData = {
             nombre: formData.get('nombre'),
             precio: parseFloat(formData.get('precio')),
             categoria: formData.get('categoria'),
             descripcion: formData.get('descripcion')
         };
+
+        if (isEdit && imagenActual.trim()) {
+            productData.imagen = imagenActual.trim();
+        }
         
         try {
             let response;
@@ -189,6 +194,11 @@ async function renderFormulario(id = null) {
                     body: JSON.stringify(productData)
                 });
             } else {
+                const fileInputCreate = formData.get('imagen');
+                if (!fileInputCreate || !fileInputCreate.size) {
+                    alert('Selecciona una imagen para crear el producto');
+                    return;
+                }
                 response = await fetch(`${API_BASE_URL}/products`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
