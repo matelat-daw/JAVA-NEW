@@ -1,3 +1,13 @@
+import { spinnerHtml } from '../components/shared/spinner.js';
+import { homeHtml } from '../components/home/home.js';
+import { catalogoHtml } from '../components/catalogo/catalogo.js';
+import { detalleHtml } from '../components/detalle/detalle.js';
+import { productoFormHtml } from '../components/producto-form/form.js';
+import { resumenHtml } from '../components/resumen/resumen.js';
+import { contactoHtml } from '../components/contacto/contacto.js';
+import { deleteModalHtml, successModalHtml } from '../components/shared/modals.js';
+import { escapeHtml } from '../components/shared/template.js';
+
 const API_BASE_URL = 'http://localhost:8080/api';
 const IMG_BASE_URL = 'http://localhost:8080/api/imgs';
 
@@ -5,15 +15,6 @@ const app = document.getElementById('app');
 const modalContainer = document.getElementById('modal-container');
 
 let categoriasCache = null;
-
-function escapeHtml(value) {
-    return String(value)
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#39;');
-}
 
 async function fetchCategorias() {
     if (Array.isArray(categoriasCache)) return categoriasCache;
@@ -78,11 +79,11 @@ function navigate(route, params = {}) {
 
 // Routes
 async function render(route, params = {}) {
-    app.innerHTML = '<div class="container text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>';
+    app.innerHTML = await spinnerHtml();
     
     switch(route) {
         case 'home':
-            renderHome();
+            await renderHome();
             break;
         case 'catalogo':
             await renderCatalogo();
@@ -91,7 +92,7 @@ async function render(route, params = {}) {
             await renderDetalle(params.id);
             break;
         case 'nuevo':
-            renderFormulario();
+            await renderFormulario();
             break;
         case 'editar':
             await renderFormulario(params.id);
@@ -100,115 +101,23 @@ async function render(route, params = {}) {
             await renderResumen();
             break;
         case 'contacto':
-            renderContacto();
+            await renderContacto();
             break;
         default:
-            renderHome();
+            await renderHome();
     }
 }
 
 // Views
-function renderHome() {
-    app.innerHTML = `
-        <div class="container py-3 py-md-5">
-            <div class="row justify-content-center">
-                <div class="col-md-10 col-lg-8">
-                    <div class="text-center mb-4">
-                        <h1 class="mb-3 text-primary display-4 fw-bold">Tienda Tech</h1>
-                        <p class="lead mb-4">Bienvenido a nuestra tienda de tecnología moderna.</p>
-                        <div class="card bg-light border-0 p-4 mb-5 shadow-sm">
-                            <p class="mb-2 text-muted">Frontend SPA (Vanilla JS + Bootstrap 5)</p>
-                            <p class="mb-0 text-muted">Backend API (Spring Boot 4.0.6 + MariaDB)</p>
-                        </div>
-                    </div>
-                    <div class="row g-3">
-                        <div class="col-12 col-md-4">
-                            <a class="btn btn-primary btn-lg w-100 py-3" onclick="navigate('catalogo')">📦 Ver Catálogo</a>
-                        </div>
-                        <div class="col-12 col-md-4">
-                            <a class="btn btn-success btn-lg w-100 py-3" onclick="navigate('resumen')">📊 Ver Resumen</a>
-                        </div>
-                        <div class="col-12 col-md-4">
-                            <a class="btn btn-danger btn-lg w-100 py-3" onclick="navigate('contacto')">📧 Contacto</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
+async function renderHome() {
+    app.innerHTML = await homeHtml();
 }
 
 async function renderCatalogo() {
     try {
         const response = await fetch(`${API_BASE_URL}/products`);
         const products = await response.json();
-        
-        let html = `
-            <div class="container py-5">
-                <h1 class="mb-4 text-primary">📦 Catálogo de Productos</h1>
-                <div class="mb-4 text-center text-md-start">
-                    <button class="btn btn-success" onclick="navigate('nuevo')">➕ Agregar Nuevo Producto</button>
-                </div>
-                <div class="mobile-cards">
-                    ${products.map(p => `
-                        <div class="card mb-3 shadow-sm border-0">
-                            <div class="row g-0">
-                                <div class="col-4">
-                                    <img src="${IMG_BASE_URL}/${p.imagen}" class="img-fluid rounded-start h-100" style="object-fit: cover;">
-                                </div>
-                                <div class="col-8">
-                                    <div class="card-body py-2">
-                                        <h5 class="card-title mb-1 text-truncate">${p.nombre}</h5>
-                                        <p class="card-text mb-1">
-                                            <span class="badge bg-info">${p.categoria}</span>
-                                            <strong class="text-success ms-2">$${p.precio.toFixed(2)}</strong>
-                                        </p>
-                                        <div class="d-flex gap-1">
-                                            <button class="btn btn-sm btn-primary py-1" onclick="navigate('detalle', {id: ${p.id}})">👁️</button>
-                                            <button class="btn btn-sm btn-warning py-1" onclick="navigate('editar', {id: ${p.id}})">✏️</button>
-                                            <button class="btn btn-sm btn-danger py-1" onclick="confirmarEliminacion(${p.id}, '${p.nombre}')">🗑️</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-                <div class="table-responsive desktop-table">
-                    <table class="table table-hover align-middle border shadow-sm">
-                        <thead class="table-success">
-                            <tr>
-                                <th>Imagen</th>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Categoría</th>
-                                <th>Precio</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${products.map(p => `
-                                <tr>
-                                    <td><img src="${IMG_BASE_URL}/${p.imagen}" class="img-thumbnail" style="width: 70px; height: 70px; object-fit: cover;"></td>
-                                    <td><span class="badge bg-secondary">${p.id}</span></td>
-                                    <td><strong>${p.nombre}</strong></td>
-                                    <td><span class="badge bg-info">${p.categoria}</span></td>
-                                    <td><strong class="text-success">$${p.precio.toFixed(2)}</strong></td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button class="btn btn-primary" onclick="navigate('detalle', {id: ${p.id}})">👁️ Ver</button>
-                                            <button class="btn btn-warning" onclick="navigate('editar', {id: ${p.id}})">✏️ Editar</button>
-                                            <button class="btn btn-danger" onclick="confirmarEliminacion(${p.id}, '${p.nombre}')">🗑️ Eliminar</button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        `;
-        app.innerHTML = html;
+        app.innerHTML = await catalogoHtml({ products, imgBaseUrl: IMG_BASE_URL });
     } catch (error) {
         app.innerHTML = '<div class="alert alert-danger">Error al cargar el catálogo</div>';
     }
@@ -218,53 +127,7 @@ async function renderDetalle(id) {
     try {
         const response = await fetch(`${API_BASE_URL}/products/${id}`);
         const p = await response.json();
-        
-        app.innerHTML = `
-            <div class="container py-3 py-md-5">
-                <div class="row justify-content-center">
-                    <div class="col-12 col-lg-10">
-                        <nav aria-label="breadcrumb" class="mb-4">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="#" onclick="navigate('catalogo')">Catálogo</a></li>
-                                <li class="breadcrumb-item active">${p.nombre}</li>
-                            </ol>
-                        </nav>
-                        <div class="card shadow-sm border-0">
-                            <div class="card-body p-3 p-md-5">
-                                <div class="row align-items-center">
-                                    <div class="col-md-6 mb-4 mb-md-0">
-                                        <div class="position-relative">
-                                            <img src="${IMG_BASE_URL}/${p.imagen}" class="img-fluid rounded shadow-sm" style="width: 100%; height: auto; object-fit: cover;">
-                                            <span class="badge bg-info position-absolute top-0 end-0 m-3 p-2 px-3">${p.categoria}</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 ps-md-5">
-                                        <h1 class="mb-2 text-primary fw-bold">${p.nombre}</h1>
-                                        <p class="text-muted mb-4 small">ID Producto: ${p.id}</p>
-                                        <div class="mb-4">
-                                            <h2 class="text-success display-5 fw-bold">$${p.precio.toFixed(2)}</h2>
-                                        </div>
-                                        <hr class="my-4">
-                                        <div class="mb-4">
-                                            <h5 class="fw-bold text-secondary text-uppercase small mb-3">Descripción</h5>
-                                            <p>${p.descripcion}</p>
-                                        </div>
-                                        <div class="row g-2 mt-auto">
-                                            <div class="col-12 col-sm-6">
-                                                <button class="btn btn-warning btn-lg w-100" onclick="navigate('editar', {id: ${p.id}})">✏️ Editar</button>
-                                            </div>
-                                            <div class="col-12 col-sm-6">
-                                                <button class="btn btn-outline-primary btn-lg w-100" onclick="navigate('catalogo')">← Catálogo</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
+        app.innerHTML = await detalleHtml({ producto: p, imgBaseUrl: IMG_BASE_URL });
     } catch (error) {
         app.innerHTML = '<div class="alert alert-danger">Error al cargar el producto</div>';
     }
@@ -299,62 +162,13 @@ async function renderFormulario(id = null) {
         })
     ].join('');
 
-    app.innerHTML = `
-        <div class="container py-3 py-md-5">
-            <div class="row justify-content-center">
-                <div class="col-12 col-md-10 col-lg-8">
-                    <div class="d-flex align-items-center mb-4">
-                        <button class="btn btn-outline-secondary me-3 d-none d-md-inline-block" onclick="navigate('catalogo')">←</button>
-                        <h1 class="mb-0 text-primary">${isEdit ? '✏️ Editar Producto' : '➕ Nuevo Producto'}</h1>
-                    </div>
-                    <div class="card shadow-sm border-0">
-                        <div class="card-body p-3 p-md-4">
-                            <form id="productForm">
-                                <input type="hidden" name="id" value="${id || ''}">
-                                <div class="row">
-                                    <div class="col-12 col-md-8">
-                                        <div class="mb-3">
-                                            <label class="form-label">Nombre del Producto:</label>
-                                            <input type="text" class="form-control" name="nombre" value="${p.nombre}" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-4">
-                                        <div class="mb-3">
-                                            <label class="form-label">Precio ($):</label>
-                                            <input type="number" class="form-control" name="precio" value="${p.precio}" step="0.01" required>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Categoría:</label>
-                                    <select class="form-select" name="categoria" required>
-                                        ${opcionesCategorias}
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Descripción:</label>
-                                    <textarea class="form-control" name="descripcion" rows="4" required>${p.descripcion}</textarea>
-                                </div>
-                                <div class="mb-4">
-                                    <label class="form-label">Imagen del Producto:</label>
-                                    ${isEdit && p.imagen ? `<div class="mb-2"><img src="${IMG_BASE_URL}/${p.imagen}" class="img-thumbnail" style="max-height: 100px;"></div>` : ''}
-                                    <input type="file" class="form-control" name="imagen" accept="image/*" ${isEdit ? '' : 'required'}>
-                                </div>
-                                <div class="row g-2">
-                                    <div class="col-12 col-md-6 order-md-2">
-                                        <button type="submit" class="btn btn-success btn-lg w-100">✅ Guardar</button>
-                                    </div>
-                                    <div class="col-12 col-md-6 order-md-1">
-                                        <button type="button" class="btn btn-outline-secondary btn-lg w-100" onclick="navigate('catalogo')">Cancelar</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
+    app.innerHTML = await productoFormHtml({
+        producto: p,
+        isEdit,
+        id,
+        opcionesCategoriasHtml: opcionesCategorias,
+        imgBaseUrl: IMG_BASE_URL
+    });
 
     document.getElementById('productForm').onsubmit = async (e) => {
         e.preventDefault();
@@ -413,70 +227,25 @@ async function renderResumen() {
         const max = total > 0 ? Math.max(...products.map(p => p.precio)) : 0;
         const min = total > 0 ? Math.min(...products.map(p => p.precio)) : 0;
 
-        app.innerHTML = `
-            <div class="container py-5">
-                <h1 class="mb-5 text-center text-primary">📊 Resumen de la Tienda</h1>
-                <div class="row g-4">
-                    <div class="col-md-6 col-lg-4"><div class="card text-white bg-info"><div class="card-body text-center py-4"><h5>Total Productos</h5><p class="display-6 fw-bold">${total}</p></div></div></div>
-                    <div class="col-md-6 col-lg-4"><div class="card text-white bg-success"><div class="card-body text-center py-4"><h5>Categorías</h5><p class="display-6 fw-bold">${categorias.length}</p></div></div></div>
-                    <div class="col-md-6 col-lg-4"><div class="card text-white bg-warning"><div class="card-body text-center py-4"><h5>Precio Promedio</h5><p class="display-6 fw-bold">$${avg.toFixed(2)}</p></div></div></div>
-                    <div class="col-md-6 col-lg-4"><div class="card text-white bg-danger"><div class="card-body text-center py-4"><h5>Más Caro</h5><p class="display-6 fw-bold">$${max.toFixed(2)}</p></div></div></div>
-                    <div class="col-md-6 col-lg-4"><div class="card text-white bg-secondary"><div class="card-body text-center py-4"><h5>Más Barato</h5><p class="display-6 fw-bold">$${min.toFixed(2)}</p></div></div></div>
-                </div>
-            </div>
-        `;
+        app.innerHTML = await resumenHtml({
+            total,
+            categoriasCount: categorias.length,
+            avg,
+            max,
+            min
+        });
     } catch (error) {
         app.innerHTML = '<div class="alert alert-danger">Error al cargar resumen</div>';
     }
 }
 
-function renderContacto() {
-    app.innerHTML = `
-        <div class="container py-5">
-            <h1 class="mb-5 text-center text-primary">📧 Contacto</h1>
-            <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="card p-4 shadow-sm">
-                        <h5>Tienda Tech SPA</h5>
-                        <p>Calle Principal 123, SPA City</p>
-                        <p>Tel: +34 900 000 000</p>
-                        <p>Email: spa@tiendatech.com</p>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card p-4 shadow-sm">
-                        <form onsubmit="event.preventDefault(); alert('Mensaje enviado!'); navigate('home');">
-                            <div class="mb-3"><label class="form-label">Nombre</label><input type="text" class="form-control" required></div>
-                            <div class="mb-3"><label class="form-label">Email</label><input type="email" class="form-control" required></div>
-                            <div class="mb-3"><label class="form-label">Mensaje</label><textarea class="form-control" rows="3" required></textarea></div>
-                            <button type="submit" class="btn btn-primary w-100">Enviar</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
+async function renderContacto() {
+    app.innerHTML = await contactoHtml();
 }
 
 // Helpers
-function confirmarEliminacion(id, nombre) {
-    const modalHtml = `
-        <div class="modal fade" id="deleteModal" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header bg-danger text-white"><h5>Confirmar Eliminación</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
-                    <div class="modal-body text-center py-4">
-                        <p>¿Estás seguro de eliminar?</p>
-                        <h4 class="fw-bold">${nombre}</h4>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button class="btn btn-danger" onclick="deleteProduct(${id})">Eliminar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
+async function confirmarEliminacion(id, nombre) {
+    const modalHtml = await deleteModalHtml({ id, nombre });
     modalContainer.innerHTML = modalHtml;
     const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
     modal.show();
@@ -492,24 +261,16 @@ async function deleteProduct(id) {
     }
 }
 
-function showSuccessModal(accion, nombre) {
-    const modalHtml = `
-        <div class="modal fade" id="successModal" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-success">
-                    <div class="modal-header bg-success text-white"><h5>✅ Éxito</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
-                    <div class="modal-body text-center py-4">
-                        <p>Producto <strong>${nombre}</strong> ${accion} correctamente.</p>
-                    </div>
-                    <div class="modal-footer"><button class="btn btn-success" data-bs-dismiss="modal">Cerrar</button></div>
-                </div>
-            </div>
-        </div>
-    `;
+async function showSuccessModal(accion, nombre) {
+    const modalHtml = await successModalHtml({ accion, nombre });
     modalContainer.innerHTML = modalHtml;
     const modal = new bootstrap.Modal(document.getElementById('successModal'));
     modal.show();
 }
+
+window.navigate = navigate;
+window.confirmarEliminacion = confirmarEliminacion;
+window.deleteProduct = deleteProduct;
 
 window.addEventListener('popstate', () => {
     const { route, params } = routeFromLocation();

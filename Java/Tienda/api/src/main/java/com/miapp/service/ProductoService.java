@@ -52,7 +52,7 @@ public class ProductoService {
         String imagenAnterior = null;
         
         // CORRECCIÓN: Validar que el objeto ID exista y sea mayor que cero
-        if (producto.getId() != null && producto.getId() > 0) {
+        if ((Integer)producto.getId() != null && producto.getId() > 0) {
             Optional<Producto> productoExistente = productoRepository.findById(producto.getId());
             if (productoExistente.isPresent()) {
                 imagenAnterior = productoExistente.get().getImagen();
@@ -65,7 +65,7 @@ public class ProductoService {
             }
             String nombreImagen = ImagesUtil.guardarImagen(imagenFile);
             producto.setImagen(nombreImagen);
-        } else if (producto.getId() != null && producto.getId() > 0 && imagenAnterior != null) {
+        } else if ((Integer)producto.getId() != null && producto.getId() > 0 && imagenAnterior != null) {
             producto.setImagen(imagenAnterior);
         }
 

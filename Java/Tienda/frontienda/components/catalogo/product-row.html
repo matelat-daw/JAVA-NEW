@@ -1,0 +1,15 @@
+<tr>
+    <td><img src="{{imagenSrc}}" class="img-thumbnail" style="width: 70px; height: 70px; object-fit: cover;"></td>
+    <td><span class="badge bg-secondary">{{id}}</span></td>
+    <td><strong>{{nombre}}</strong></td>
+    <td><span class="badge bg-info">{{categoria}}</span></td>
+    <td><strong class="text-success">$ {{precio}}</strong></td>
+    <td>
+        <div class="btn-group btn-group-sm">
+            <button class="btn btn-primary" onclick="navigate('detalle', {id: '{{id}}'})">👁️ Ver</button>
+            <button class="btn btn-warning" onclick="navigate('editar', {id: '{{id}}'})">✏️ Editar</button>
+            <button class="btn btn-danger" onclick="confirmarEliminacion('{{id}}', '{{nombreJs}}')">🗑️ Eliminar</button>
+        </div>
+    </td>
+</tr>
+
